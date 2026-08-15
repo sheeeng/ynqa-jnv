@@ -185,9 +185,9 @@ async fn main() -> anyhow::Result<()> {
                 .map_err(|e| anyhow!("Failed to read configuration file: {e}"))
         })
         .and_then(|content| Config::load_from(&content))
-        .unwrap_or_else(|_e| {
-            Config::load_from(DEFAULT_CONFIG).expect("Failed to load default configuration")
-        });
+        // a missing file is already seeded with the defaults by ensure_file_exists,
+        // so anything failing here is a real problem the user should hear about
+        .map_err(|e| anyhow!("{e}"))?;
 
     // Set up terminal
     crossterm::terminal::enable_raw_mode()?;
